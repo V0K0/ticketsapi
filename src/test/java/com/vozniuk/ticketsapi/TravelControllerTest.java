@@ -4,8 +4,8 @@ import com.vozniuk.ticketsapi.controllers.TravelController;
 import com.vozniuk.ticketsapi.data.entity.RequestStatus;
 import com.vozniuk.ticketsapi.data.entity.Ticket;
 import com.vozniuk.ticketsapi.data.entity.TravelRequest;
-import com.vozniuk.ticketsapi.data.service.TicketService;
-import com.vozniuk.ticketsapi.data.service.TravelRequestService;
+import com.vozniuk.ticketsapi.data.service.impl.TicketServiceImpl;
+import com.vozniuk.ticketsapi.data.service.impl.TravelRequestServiceImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -32,18 +32,18 @@ class TravelControllerTest {
         Ticket ticket = new Ticket();
         ticket.setDepartureTime(Timestamp.valueOf(LocalDateTime.now()));
         ticket.setRouteNumber(1);
-        ticket.setTicketId(1);
+        ticket.setId(1L);
 
         request = new TravelRequest();
         request.setStatus(RequestStatus.PROCESSING);
         request.setTicket(ticket);
-        request.setTravelRequestId(1L);
+        request.setId(1L);
     }
 
     @Test
     void testGetById() {
-        TravelRequestService travelRequestService = mock(TravelRequestService.class);
-        TicketService ticketService = mock(TicketService.class);
+        TravelRequestServiceImpl travelRequestService = mock(TravelRequestServiceImpl.class);
+        TicketServiceImpl ticketService = mock(TicketServiceImpl.class);
         when(travelRequestService.getTravelRequestById(anyLong())).thenReturn(request);
 
         TravelController controller = new TravelController(travelRequestService, ticketService);
@@ -54,9 +54,9 @@ class TravelControllerTest {
     }
 
     @Test
-    void testNotExistingIdResponse(){
-        TravelRequestService travelRequestService = mock(TravelRequestService.class);
-        TicketService ticketService = mock(TicketService.class);
+    void testNotExistingIdResponse() {
+        TravelRequestServiceImpl travelRequestService = mock(TravelRequestServiceImpl.class);
+        TicketServiceImpl ticketService = mock(TicketServiceImpl.class);
         when(travelRequestService.getTravelRequestById(anyLong())).thenThrow(EntityNotFoundException.class);
 
         TravelController travelController = new TravelController(travelRequestService, ticketService);
@@ -65,9 +65,9 @@ class TravelControllerTest {
     }
 
     @Test
-    void testCreateNewRequestStatus_201(){
-        TicketService ticketService = mock(TicketService.class);
-        TravelRequestService travelRequestService = mock(TravelRequestService.class);
+    void testCreateNewRequestStatus_201() {
+        TicketServiceImpl ticketService = mock(TicketServiceImpl.class);
+        TravelRequestServiceImpl travelRequestService = mock(TravelRequestServiceImpl.class);
 
         TravelController controller = new TravelController(travelRequestService, ticketService);
         Object response = controller.createNewTravelRequest("2020-08-29 20:00:00", 100);
@@ -76,16 +76,16 @@ class TravelControllerTest {
     }
 
     @Test
-    void testControllerStatusOnInvalidParams_400(){
-        TicketService ticketService = mock(TicketService.class);
-        TravelRequestService travelRequestService = mock(TravelRequestService.class);
-        doThrow(IllegalArgumentException.class).when(ticketService).saveNewTicket(any());
+    void testControllerStatusOnInvalidParams_400() {
+        TicketServiceImpl ticketService = mock(TicketServiceImpl.class);
+        TravelRequestServiceImpl travelRequestService = mock(TravelRequestServiceImpl.class);
+        doThrow(IllegalArgumentException.class).when(ticketService).saveTicket(any());
 
         TravelController controller = new TravelController(travelRequestService, ticketService);
 
         Object badDateResponse = controller.createNewTravelRequest("any string", 20);
 
-        verify(ticketService, times(1)).saveNewTicket(any());
+        verify(ticketService, times(1)).saveTicket(any());
         HttpStatus actualStatusCode = ((ResponseEntity) badDateResponse).getStatusCode();
         assertEquals(HttpStatus.BAD_REQUEST, actualStatusCode);
     }

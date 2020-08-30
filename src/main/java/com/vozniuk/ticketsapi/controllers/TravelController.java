@@ -3,7 +3,8 @@ package com.vozniuk.ticketsapi.controllers;
 import com.vozniuk.ticketsapi.data.entity.Ticket;
 import com.vozniuk.ticketsapi.data.entity.TravelRequest;
 import com.vozniuk.ticketsapi.data.service.TicketService;
-import com.vozniuk.ticketsapi.data.service.TravelRequestService;
+import com.vozniuk.ticketsapi.data.service.impl.TicketServiceImpl;
+import com.vozniuk.ticketsapi.data.service.impl.TravelRequestServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +22,13 @@ import java.util.Collections;
 @RequestMapping("/travels")
 public class TravelController {
 
-    private final TravelRequestService travelRequestService;
+    private final TravelRequestServiceImpl travelRequestService;
     private final TicketService ticketService;
 
     private final Logger logger = LoggerFactory.getLogger(TravelController.class);
 
     @Autowired
-    public TravelController(TravelRequestService travelRequestService, TicketService ticketService) {
+    public TravelController(TravelRequestServiceImpl travelRequestService, TicketService ticketService) {
         this.travelRequestService = travelRequestService;
         this.ticketService = ticketService;
     }
@@ -54,10 +55,10 @@ public class TravelController {
             ticket.setRouteNumber(routeNumber);
 
             try {
-                ticketService.saveNewTicket(ticket);
+                ticketService.saveTicket(ticket);
                 request.setTicket(ticket);
-                travelRequestService.saveNewRequest(request);
-                return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("request_id", request.getTravelRequestId()));
+                travelRequestService.saveRequest(request);
+                return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("request_id", request.getId()));
             } catch (IllegalArgumentException exception) {
                 logger.error("Could not execute saving to database cause of: {}", exception.getMessage());
             }

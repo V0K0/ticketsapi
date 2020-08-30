@@ -3,7 +3,6 @@ package com.vozniuk.ticketsapi.data.service;
 import com.vozniuk.ticketsapi.data.entity.RequestStatus;
 import com.vozniuk.ticketsapi.data.entity.Ticket;
 import com.vozniuk.ticketsapi.data.entity.TravelRequest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -33,28 +32,28 @@ class TravelRequestServiceTest {
     @Test
     void testServiceThrowsExceptionRequestWithoutTicket() {
         TravelRequest request = new TravelRequest();
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> travelRequestService.saveNewRequest(request));
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> travelRequestService.saveRequest(request));
         assertEquals("Entity TravelRequest is not valid", ex.getMessage());
     }
 
     @Test
     void testServiceThrowsExceptionOnNull() {
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> travelRequestService.saveNewRequest(null));
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> travelRequestService.saveRequest(null));
         assertEquals("Entity TravelRequest is not valid", ex.getMessage());
     }
 
     @Test
     void testServiceSetsStatusOnRequest() {
         TravelRequest request = getRequest();
-        travelRequestService.saveNewRequest(request);
+        travelRequestService.saveRequest(request);
         assertEquals(RequestStatus.PROCESSING, request.getStatus());
     }
 
     @Test
     void testRequestServicePersistsRequest() {
         TravelRequest request = getRequest();
-        travelRequestService.saveNewRequest(request);
-        assertNotEquals(0, request.getTravelRequestId());
+        travelRequestService.saveRequest(request);
+        assertNotEquals(0, request.getId());
     }
 
     @Test
@@ -63,10 +62,11 @@ class TravelRequestServiceTest {
     }
 
     @Test
-    void testGetRequestReturnsCorrectEntity(){
+    void testGetRequestReturnsCorrectEntity() {
         TravelRequest travelRequest = getRequest();
-        travelRequestService.saveNewRequest(travelRequest);
-        assertEquals(travelRequest, travelRequestService.getTravelRequestById(travelRequest.getTravelRequestId()));
+        travelRequestService.saveRequest(travelRequest);
+        TravelRequest request = travelRequestService.getTravelRequestById(travelRequest.getId());
+        assertEquals(travelRequest, request);
     }
 
     private TravelRequest getRequest() {

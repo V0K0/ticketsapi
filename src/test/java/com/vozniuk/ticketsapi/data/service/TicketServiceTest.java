@@ -36,7 +36,7 @@ class TicketServiceTest {
     @Test
     @Order(1)
     void testCorrectNumberOfTickets(){
-        tickets.forEach(ticket -> ticketService.saveNewTicket(ticket));
+        tickets.forEach(ticket -> ticketService.saveTicket(ticket));
         int countOfSavedTickets = ticketService.getAllTickets().size();
         assertEquals(tickets.size(), countOfSavedTickets);
     }
@@ -44,15 +44,15 @@ class TicketServiceTest {
     @Test
     void testServicePersistsTicket() {
         Ticket ticket = getTicket();
-        ticketService.saveNewTicket(ticket);
-        assertNotEquals(0, ticket.getTicketId());
+        ticketService.saveTicket(ticket);
+        assertNotEquals(0, ticket.getId());
     }
 
     @Test
     void testGetTicketThatWasSaved() {
         Ticket ticket = getTicket();
-        ticketService.saveNewTicket(ticket);
-        Ticket ticketFromDb = ticketService.getTicketById(ticket.getTicketId());
+        ticketService.saveTicket(ticket);
+        Ticket ticketFromDb = ticketService.getTicketById(ticket.getId());
         assertEquals(ticket, ticketFromDb);
     }
 
@@ -60,7 +60,7 @@ class TicketServiceTest {
     void testAddTicketWithoutTime(){
         Ticket timelessTicket = new Ticket();
         timelessTicket.setRouteNumber(1);
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> ticketService.saveNewTicket(timelessTicket));
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> ticketService.saveTicket(timelessTicket));
         assertEquals("Entity Ticket is not valid", ex.getMessage());
     }
 
@@ -68,7 +68,7 @@ class TicketServiceTest {
     void testAddTicketWithoutRoute(){
         Ticket timelessTicket = new Ticket();
         timelessTicket.setDepartureTime(Timestamp.valueOf(LocalDateTime.now()));
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> ticketService.saveNewTicket(timelessTicket));
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> ticketService.saveTicket(timelessTicket));
         assertEquals("Entity Ticket is not valid", ex.getMessage());
     }
 

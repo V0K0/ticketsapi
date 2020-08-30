@@ -1,27 +1,19 @@
 package com.vozniuk.ticketsapi.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
-@EqualsAndHashCode(of = "ticketId")
 @Table(name = "ticket")
-public class Ticket implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ticket_id")
-    private long ticketId;
+public class Ticket extends IndexedEntity {
 
     @Column(name = "departure_time", nullable = false)
     private Timestamp departureTime;
@@ -36,10 +28,11 @@ public class Ticket implements Serializable {
     @Override
     public String toString() {
         return "Ticket{" +
-                "ticketId=" + ticketId +
+                "ticketId=" + id +
                 ", departureTime=" + departureTime +
                 ", routeNumber=" + routeNumber +
-                ", travel_request_id=" + travelRequest.getTravelRequestId() +
-                '}';
+                "}";
     }
+
+
 }
