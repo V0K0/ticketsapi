@@ -40,6 +40,7 @@ public class TicketService implements TicketDao {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
     }

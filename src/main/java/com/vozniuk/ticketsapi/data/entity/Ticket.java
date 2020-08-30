@@ -1,5 +1,6 @@
 package com.vozniuk.ticketsapi.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,12 +29,17 @@ public class Ticket implements Serializable {
     @Column(name = "route_number", nullable = false)
     private int routeNumber;
 
+    @JsonManagedReference
+    @OneToOne(mappedBy = "ticket", fetch = FetchType.LAZY)
+    private TravelRequest travelRequest;
+
     @Override
     public String toString() {
         return "Ticket{" +
                 "ticketId=" + ticketId +
                 ", departureTime=" + departureTime +
                 ", routeNumber=" + routeNumber +
+                ", travel_request_id=" + travelRequest.getTravelRequestId() +
                 '}';
     }
 }

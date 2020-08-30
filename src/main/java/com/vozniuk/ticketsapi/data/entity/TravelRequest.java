@@ -1,5 +1,6 @@
 package com.vozniuk.ticketsapi.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class TravelRequest implements Serializable {
     @Column(name = "status", nullable = false)
     private RequestStatus status;
 
+    @JsonBackReference
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ticket_id", unique = true)
     private Ticket ticket;
