@@ -2,14 +2,14 @@ package com.vozniuk.ticketsapi.data.service;
 
 import com.vozniuk.ticketsapi.data.entity.Ticket;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 
 public interface TicketService {
 
-    void saveTicket(Ticket ticket);
+    void saveTicket(Ticket ticket) throws IllegalArgumentException;
 
-    Ticket getTicketById(long id);
+    Ticket getTicketById(long id) throws EntityNotFoundException;
 
     List<Ticket> getAllTickets();
 }

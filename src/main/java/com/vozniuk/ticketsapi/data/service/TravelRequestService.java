@@ -1,9 +1,22 @@
 package com.vozniuk.ticketsapi.data.service;
 
+import com.vozniuk.ticketsapi.data.entity.RequestStatus;
 import com.vozniuk.ticketsapi.data.entity.TravelRequest;
 
-public interface TravelRequestService {
-    void saveRequest(TravelRequest travelRequest);
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.Optional;
 
-    TravelRequest getTravelRequestById(long id);
+
+public interface TravelRequestService {
+
+    void saveRequest(TravelRequest travelRequest) throws IllegalArgumentException;
+
+    TravelRequest getTravelRequestById(long id) throws EntityNotFoundException;
+
+    List<TravelRequest> getAllRequestsByUserId(long id) throws EntityNotFoundException;
+
+    Optional<List<TravelRequest>> findProcessingTravelRequests();
+
+    void changeRequestStatus(long id, RequestStatus requestStatus);
 }
