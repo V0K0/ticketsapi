@@ -25,10 +25,12 @@ class TicketServiceTest {
 
     private static List<Ticket> tickets;
 
+    private static long userId = 1L;
+
     @BeforeAll
-    private static void testSetUpTicketsCollection(){
+    private static void testSetUpTicketsCollection() {
         tickets = new ArrayList<>();
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             tickets.add(getTicket());
         }
     }
@@ -49,14 +51,6 @@ class TicketServiceTest {
     }
 
     @Test
-    void testGetTicketThatWasSaved() {
-        Ticket ticket = getTicket();
-        ticketService.saveTicket(ticket);
-        Ticket ticketFromDb = ticketService.getTicketById(ticket.getId());
-        assertEquals(ticket, ticketFromDb);
-    }
-
-    @Test
     void testAddTicketWithoutTime(){
         Ticket timelessTicket = new Ticket();
         timelessTicket.setRouteNumber(1);
@@ -64,24 +58,25 @@ class TicketServiceTest {
         assertEquals("Entity Ticket is not valid", ex.getMessage());
     }
 
-    @Test
-    void testAddTicketWithoutRoute(){
-        Ticket timelessTicket = new Ticket();
-        timelessTicket.setDepartureTime(Timestamp.valueOf(LocalDateTime.now()));
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> ticketService.saveTicket(timelessTicket));
-        assertEquals("Entity Ticket is not valid", ex.getMessage());
-    }
-
-    @Test
-    void testThrowExceptionWhenTicketNotFound(){
-        assertThrows(EntityNotFoundException.class, () -> ticketService.getTicketById(999));
-    }
-
-    private static Ticket getTicket(){
+    private static Ticket getTicket() {
         Ticket ticket = new Ticket();
         ticket.setRouteNumber(1);
         ticket.setDepartureTime(Timestamp.valueOf(LocalDateTime.now()));
+        ticket.setUserId(userId++);
         return ticket;
+    }
+
+    @Test
+    void testThrowExceptionWhenTicketNotFound() {
+        assertThrows(EntityNotFoundException.class, () -> ticketService.getTicketById(999));
+    }
+
+    @Test
+    void testAddTicketWithoutRoute() {
+        Ticket routeLessTicket = new Ticket();
+        routeLessTicket.setDepartureTime(Timestamp.valueOf(LocalDateTime.now()));
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> ticketService.saveTicket(routeLessTicket));
+        assertEquals("Entity Ticket is not valid", ex.getMessage());
     }
 
 }
