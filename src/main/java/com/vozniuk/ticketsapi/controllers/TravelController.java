@@ -3,8 +3,7 @@ package com.vozniuk.ticketsapi.controllers;
 import com.vozniuk.ticketsapi.data.entity.Ticket;
 import com.vozniuk.ticketsapi.data.entity.TravelRequest;
 import com.vozniuk.ticketsapi.data.service.TicketService;
-import com.vozniuk.ticketsapi.data.service.impl.TicketServiceImpl;
-import com.vozniuk.ticketsapi.data.service.impl.TravelRequestServiceImpl;
+import com.vozniuk.ticketsapi.data.service.TravelRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,27 +13,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
-import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.List;
 
 
 @RestController
-@RequestMapping("/travels")
+@RequestMapping("/api")
 public class TravelController {
 
-    private final TravelRequestServiceImpl travelRequestService;
+    private final TravelRequestService travelRequestService;
     private final TicketService ticketService;
 
     private final Logger logger = LoggerFactory.getLogger(TravelController.class);
 
     @Autowired
-    public TravelController(TravelRequestServiceImpl travelRequestService, TicketService ticketService) {
+    public TravelController(TravelRequestService travelRequestService, TicketService ticketService) {
         this.travelRequestService = travelRequestService;
         this.ticketService = ticketService;
     }
 
-    @GetMapping(value = "/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
-    public Object getTravelRequestStatus(@PathVariable long id) {
+    @GetMapping(value = "/travels/{id}")
+    public ResponseEntity<?> getTravelRequestStatusById(@PathVariable long id) {
         try {
             TravelRequest request = travelRequestService.getTravelRequestById(id);
             return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonMap("status", request.getStatus()));
@@ -44,35 +43,29 @@ public class TravelController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
-    @PostMapping
-    public Object createNewTravelRequest(@RequestParam(name = "time") String time, @RequestParam(name = "route") int routeNumber) {
-        if (time != null && routeNumber > 0) {
-            Timestamp departure = convertToTimestamp(time);
-
-            Ticket ticket = new Ticket();
-            TravelRequest request = new TravelRequest();
-            ticket.setDepartureTime(departure);
-            ticket.setRouteNumber(routeNumber);
-
-            try {
-                ticketService.saveTicket(ticket);
-                request.setTicket(ticket);
-                travelRequestService.saveRequest(request);
-                return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("request_id", request.getId()));
-            } catch (IllegalArgumentException exception) {
-                logger.error("Could not execute saving to database cause of: {}", exception.getMessage());
-            }
+    @GetMapping(value = "/users/{id}")
+    public ResponseEntity<?> getAllUserRequestsById(@PathVariable long id) {
+        try {
+            List<TravelRequest> allRequestsByUserId = travelRequestService.getAllRequestsByUserId(id);
+            return ResponseEntity.status(HttpStatus.OK).body(allRequestsByUserId);
+        } catch (EntityNotFoundException exception) {
+            logger.error("Failed attempt to find requests. Cause: {}", exception.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
-    private Timestamp convertToTimestamp(String time) {
+    @PostMapping(value = "/travels", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createTravelRequest(@RequestBody Ticket ticket) {
         try {
-            return Timestamp.valueOf(time);
-        } catch (IllegalArgumentException e) {
-            logger.error("Failed attempt to parse date");
+            TravelRequest travelRequest = new TravelRequest();
+            ticketService.saveTicket(ticket);
+            travelRequest.setTicket(ticket);
+            travelRequestService.saveRequest(travelRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("request_id", travelRequest.getId()));
+        } catch (Exception e) {
+            logger.error("Could not execute saving to database cause of: {}", e.getMessage());
         }
-        return null;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
 }
