@@ -1,6 +1,5 @@
 package com.vozniuk.ticketsapi.data.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -20,12 +18,12 @@ public abstract class IndexedEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(name = "create_timestamp")
+    @Column(name = "created_at")
     @CreationTimestamp
-    protected Timestamp createTimestamp;
+    protected Timestamp createdAt;
 
-    @Column(name = "update_timestamp")
+    @Column(name = "updated_at")
     @UpdateTimestamp
-    protected Timestamp updateTimestamp;
+    protected Timestamp updatedAt;
 
 }
